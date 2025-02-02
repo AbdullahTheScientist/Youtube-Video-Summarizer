@@ -29,6 +29,7 @@ def extract_transcript(youtube_video_url):
         transcript = " ".join([i["text"] for i in transcript_text])
         return transcript
     except Exception as e:
+        # st.error(f"Error fetching transcript: {e}")
         st.error(f"Error fetching transcript: {e}")
         return None
 
@@ -63,14 +64,20 @@ user_input = st.text_input("Ask a question about the summary:")
 if st.button("Ask"):
     if user_input and st.session_state["summary"]:
         model = genai.GenerativeModel("gemini-pro")
-        response = model.generate_content(f"Answer based on the summary: {st.session_state['summary']} \n\nUser: {user_input}")
+        response = model.generate_content(
+            f"""
+            You are a helpful and informative assistant. Provide a thoughtful and relevant response based on the summary below.
+            If the user's question is directly related to the summary, answer it in detail.
+            If the question is somewhat related but not directly covered in the summary, provide useful context or background information.
+            If the question is completely unrelated, politely guide the user back to the topic.
+
+            Summary:
+            {st.session_state['summary']}
+
+            User: {user_input}
+            """
+        )
 
         # Display only the latest response
         st.markdown(f"**You:** {user_input}")
         st.markdown(f"**AI:** {response.text}")
-
-
-
-
-
-# You can also include a chat section or other functionality as needed.

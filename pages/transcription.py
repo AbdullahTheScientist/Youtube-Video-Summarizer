@@ -52,8 +52,20 @@ user_input = st.text_input("Ask a question about the transcript:")
 if st.button("Ask"):
     if user_input and st.session_state["transcript"]:
         model = genai.GenerativeModel("gemini-pro")
-        response = model.generate_content(f"Answer based on the transcript: {st.session_state['transcript']} \n\nUser: {user_input}")
-        
+        response = model.generate_content(
+            f"""
+            You are an intelligent assistant. Provide a well-structured and informative response based on the transcript below.
+            - If the user's question is directly related to the transcript, answer it accurately.
+            - If the question is somewhat related but not explicitly covered in the transcript, provide relevant insights or background information.
+            - If the question is unrelated, politely redirect the user toward discussing the transcript content.
+
+            Transcript:
+            {st.session_state['transcript']}
+
+            User: {user_input}
+            """
+        )
+                
         # Display only the latest response
         st.markdown(f"**You:** {user_input}")
         st.markdown(f"**AI:** {response.text}")
